@@ -1,0 +1,292 @@
+import got, {
+  OptionsOfTextResponseBody,
+  Headers,
+  SearchParameters,
+  RequestError,
+} from "got";
+import { CookieJar, Cookie } from "tough-cookie";
+import { AMRealm } from "../AM/amRealm";
+import { Matcher, PropertiesMatcher } from "hamjest";
+import {
+  validateCallbacks,
+  validateError,
+  validateResponse,
+} from "./Assertions/utils";
+import { AuthenticateResponse, Callback, CallbackType } from "../Types";
+import { checkEmail } from "../Utils/email";
+import { Logger } from "../Utils/logger";
+import { stepMessageBuilder } from "./journeyUtils";
+
+export class Journey {
+  private _name: string;
+  private _lastResponse: AuthenticateResponse | null = null;
+  private _curCallbacks: Callback[] | null = null;
+  private _realm: AMRealm;
+  private _headers: Headers | null = null;
+  private _otpAuthURI: string | null = null;
+  private _otp: string | null = null;
+  private _authError: any | null = null;
+  private _queryParams: SearchParameters | null = null;
+  private _cookieParams: { key: string; value: string } | null = null;
+
+  public constructor(
+    name: string,
+    realm: AMRealm,
+    headers?: Headers,
+    queryParams?: SearchParameters,
+    cookieParams?: { key: string; value: string }
+  ) {
+    this._name = name;
+    this._realm = realm;
+
+    if (headers) {
+      this._headers = headers;
+    }
+    if (queryParams) {
+      this._queryParams = queryParams;
+    }
+    if (cookieParams) {
+      this._cookieParams = cookieParams;
+    }
+  }
+
+  public get lastResponse() {
+    return this._lastResponse;
+  }
+
+  public get otp(): string | null {
+    return this._otp;
+  }
+
+  public get otpAuthURI(): string | null {
+    return this._otpAuthURI;
+  }
+
+  public set otp(otp: string) {
+    this._otp = otp;
+  }
+
+  public set otpAuthURI(otpAuthURI: string) {
+    this._otpAuthURI = otpAuthURI;
+  }
+
+  /**
+   * Move to the next step of the journey by calling the post authenticate endpoint.
+   */
+  public async nextStep() {
+    const result = await this._postAuthenticate({
+      journeyName: this._name,
+      body: {
+        ...this._lastResponse,
+        callbacks: this._curCallbacks,
+      },
+      headers: this._headers ?? {},
+      queryParams: this._queryParams ?? {},
+      cookieParams: this._cookieParams ?? undefined,
+    });
+
+    this._lastResponse = result;
+    this._curCallbacks = result?.callbacks ?? null;
+    return result;
+  }
+
+  public validateCallbacks(
+    matchers: Matcher[],
+    stepName: string,
+    stage: string
+  ) {
+    if (!this._lastResponse)
+      throw new Error(
+        stepMessageBuilder(
+          stepName,
+          stage,
+          "validate callbacks",
+          `Unexpected error response: ${this._authError.message}`
+        )
+      );
+
+    return validateCallbacks(this._lastResponse.callbacks, matchers, stepName);
+  }
+
+  public validateResponse(
+    matchers: PropertiesMatcher | PropertiesMatcher[],
+    stepName: string,
+    stage: string
+  ) {
+    if (!this._lastResponse)
+      throw new Error(
+        stepMessageBuilder(
+          stepName,
+          stage,
+          "validate response",
+          `Unexpected error response: ${this._authError.message}`
+        )
+      );
+
+    return validateResponse(this._lastResponse, matchers, stepName);
+  }
+
+  public validateError(
+    matchers: PropertiesMatcher | PropertiesMatcher[],
+    stepName: string,
+    stage: string
+  ) {
+    if (!this._authError)
+      throw new Error(
+        stepMessageBuilder(
+          stepName,
+          stage,
+          "validate error",
+          `Unexpected error response: ${this._authError.message}`
+        )
+      );
+
+    return validateError(this._authError, matchers, stepName);
+  }
+
+  /**
+   * Set the value for a provided callback type
+   * @param value a value to set as the callback value
+   */
+  public setValue(
+    callbackType: CallbackType,
+    value: string,
+    stepName: string,
+    stage: string
+  ) {
+    if (!this._curCallbacks)
+      throw new Error(
+        stepMessageBuilder(
+          stepName,
+          stage,
+          `set ${callbackType} to ${value}`,
+          "Callbacks are undefined"
+        )
+      );
+
+    const callbackIndex = this._curCallbacks.findIndex((item) => {
+      return item.type === callbackType;
+    });
+
+    if (!this._curCallbacks?.[callbackIndex]?.input)
+      throw new Error(
+        stepMessageBuilder(
+          stepName,
+          stage,
+          `set ${callbackType} to ${value}`,
+          "There was a problem seting the callback value"
+        )
+      );
+
+    this._curCallbacks[callbackIndex].input[0].value = value;
+  }
+
+  public findOtpAuthURI() {
+    let otpAuthURI: null | string = null;
+    this._lastResponse?.callbacks.map((item) => {
+      item.output?.some((outputItem) => {
+        if (
+          typeof outputItem.value === "string" &&
+          outputItem.value.includes("otpauth://")
+        ) {
+          otpAuthURI = outputItem.value;
+        }
+      });
+    });
+    return otpAuthURI;
+  }
+
+  public async checkEmail({
+    sender,
+    subject,
+    emailParser,
+    timeDelay,
+  }: {
+    sender?: string;
+    subject?: string;
+    emailParser?: (str: string) => string;
+    timeDelay?: number;
+  }) {
+    let otpValue = await checkEmail({
+      sender,
+      subject,
+      emailParser,
+      timeDelay,
+    });
+
+    this._otp = otpValue.trim();
+  }
+
+  private async _postAuthenticate({
+    journeyName,
+    body,
+    headers,
+    queryParams,
+    cookieParams,
+  }: {
+    journeyName: string;
+    body: unknown;
+    headers: Headers;
+    queryParams: SearchParameters;
+    cookieParams?: { key: string; value: string };
+  }): Promise<AuthenticateResponse | null> {
+    const logger = Logger.getInstance();
+    const baseUrl = new URL(this._realm.AM.baseURL);
+
+    let options: OptionsOfTextResponseBody = {
+      searchParams: {
+        ...queryParams,
+        realm: this._realm.realmName,
+        authIndexType: "service",
+        authIndexValue: journeyName,
+      },
+    };
+
+    if (cookieParams) {
+      const cookieJar = new CookieJar();
+      const cookie = new Cookie({
+        key: cookieParams.key,
+        value: cookieParams.value,
+        domain: baseUrl.hostname,
+        path: "/",
+        creation: new Date(),
+      });
+
+      await cookieJar.setCookie(cookie, baseUrl.href);
+
+      options = {
+        ...options,
+        cookieJar,
+      };
+    }
+
+    options = {
+      ...options,
+      ignoreInvalidCookies: true,
+      method: "POST",
+      json: body ? { ...body } : {},
+      headers: {
+        ...headers,
+        "Is-Journey-Test": "true",
+        "X-Requested-With": "ping-aic-library-ts",
+        "accept-api-version": "protocol=1.0,resource=2.1",
+      },
+    };
+
+    try {
+      const data = await got(
+        `${baseUrl.href}am/json/authenticate`,
+        options
+      ).json();
+
+      this._authError = null;
+
+      logger.info(JSON.stringify(data));
+      return data as AuthenticateResponse;
+    } catch (error: any) {
+      this._authError = error as RequestError<unknown>;
+    }
+
+    return null;
+  }
+}
