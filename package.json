@@ -4,8 +4,7 @@
     "registry": "https://nexus.trivir.com/repository/trivir-npm/"
   },
   "private": true,
-  "version": "0.1.0",
-  "type": "module",
+  "version": "0.1.1",
   "files": [
     "dist"
   ],
