@@ -1,7 +1,7 @@
 import { loadConfig } from "../config";
 
-const { ImapFlow } = require("imapflow");
-const simpleParser = require("mailparser").simpleParser;
+import { ImapFlow } from "imapflow";
+import { simpleParser } from "mailparser";
 
 /**
  * Checks an email inbox for a specific message and extracts an OTP (One-Time Password) using a parser.
@@ -70,16 +70,16 @@ export async function checkEmail({
       throw new Error("No emails were found using the provided filter");
     }
 
-    let message = await client.fetchOne(list[list.length - 1], {
+    let message = await client.fetchOne(String(list[list.length - 1]), {
       source: true,
     });
 
     let parsed = await simpleParser(message.source);
 
     if (emailParser) {
-      otpValue = emailParser(parsed.text);
+      otpValue = emailParser(parsed.text || "");
     } else {
-      otpValue = extractOTPFromEmail(parsed.text);
+      otpValue = extractOTPFromEmail(parsed.text || "");
     }
   } finally {
     lock.release();

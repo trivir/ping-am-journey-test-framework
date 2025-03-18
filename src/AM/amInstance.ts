@@ -1,7 +1,7 @@
 import { getToken } from "./authenticate";
 import { ClientConfig } from "../Types";
 import { loadConfig } from "../config";
-const fs = require("fs").promises;
+import * as fs from 'node:fs/promises';
 
 export class AMInstance {
   private _baseURL: string;
