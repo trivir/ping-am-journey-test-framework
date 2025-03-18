@@ -8,50 +8,45 @@
   "files": [
     "dist"
   ],
+  "type": "module",
   "main": "./dist/ping-aic-lib-ts.js",
-  "module": "./dist/ping-aic-lib-ts.cjs",
+  "module": "./dist/ping-aic-lib-ts.js",
   "exports": {
     ".": {
-      "import": "./dist/ping-aic-lib-ts.js",
-      "require": "./dist/ping-aic-lib-ts.cjs"
+      "import": "./dist/ping-aic-lib-ts.js"
     },
     "./AM": {
-      "import": "./dist/AM.js",
-      "require": "./dist/AM.cjs"
+      "import": "./dist/AM.js"
     },
     "./IDM": {
-      "import": "./dist/IDM.js",
-      "require": "./dist/IDM.cjs"
+      "import": "./dist/IDM.js"
     },
     "./Assertions": {
-      "import": "./dist/Assertions.js",
-      "require": "./dist/Assertions.cjs"
+      "import": "./dist/Assertions.js"
     },
     "./Journey": {
-      "import": "./dist/Journey.js",
-      "require": "./dist/Journey.cjs"
+      "import": "./dist/Journey.js"
     },
     "./Types": {
-      "import": "./dist/Types.js",
-      "require": "./dist/Types.cjs"
+      "import": "./dist/Types.js"
     },
     "./Utils": {
-      "import": "./dist/Utils.js",
-      "require": "./dist/Utils.cjs"
+      "import": "./dist/Utils.js"
     }
   },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest "
+    "test": "vitest"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "@types/node-jose": "^1.1.13",
     "typescript": "~5.6.2",
     "vite": "^6.0.3",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "vite-plugin-dts": "^4.5.0"
   },
   "dependencies": {
     "cosmiconfig": "^9.0.0",
@@ -63,7 +58,6 @@
     "node-jose": "^2.2.0",
     "otpauth": "^9.3.6",
     "tough-cookie": "^5.1.0",
-    "uuid": "^11.0.3",
-    "vite-plugin-dts": "^4.5.0"
+    "uuid": "^11.0.3"
   }
 }
