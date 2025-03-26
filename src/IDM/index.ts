@@ -1,4 +1,4 @@
-import { IDMInstance, CloudAmAuth } from "./idmInstance";
+import { CloudAmAuth, IDMInstance } from "./idmInstance";
 import { ManagedObject } from "./managedObject";
 import * as userUtils from "./userUtils";
 

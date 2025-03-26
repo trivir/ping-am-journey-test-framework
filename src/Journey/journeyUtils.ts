@@ -1,19 +1,19 @@
-import { Headers, SearchParameters } from "got";
+import type { Headers, SearchParameters } from "got";
+import * as OTPAuth from "otpauth";
 import { AMInstance } from "../AM/amInstance";
 import { AMRealm } from "../AM/amRealm";
-import { Actions, JourneyStep, StepOperations } from "../Types";
-import { Journey } from "./journey";
+import { Actions, type JourneyStep, type StepOperations } from "../Types";
 import { loadConfig } from "../config";
-import * as OTPAuth from "otpauth";
 import {
-  checkEmail,
-  createOTP,
-  saveOtpAuthURI,
-  setCallbackValue,
-  setNameCallbackValue,
-  setOTP,
-  setPasswordCallbackValue,
+	checkEmail,
+	createOTP,
+	saveOtpAuthURI,
+	setCallbackValue,
+	setNameCallbackValue,
+	setOTP,
+	setPasswordCallbackValue,
 } from "./actions";
+import { Journey } from "./journey";
 
 /**
  * Executes a journey by processing a series of steps within a specified realm and AM instance.
@@ -28,49 +28,53 @@ import {
  * @param params.cookieParams - Optional cookie parameters to include in the journey requests.
  * @param params.cookieParams.key - The key of the cookie.
  * @param params.cookieParams.value - The value of the cookie.
- * 
+ *
  * @returns A promise that resolves when the journey steps have been processed.
  */
 export async function runJourney({
-  amUrl,
-  realmName,
-  journeyName,
-  headers,
-  queryParams,
-  steps,
-  cookieParams,
+	amUrl,
+	realmName,
+	journeyName,
+	headers,
+	queryParams,
+	steps,
+	cookieParams,
 }: {
-  amUrl?: string;
-  realmName?: string;
-  journeyName: string;
-  headers?: Headers;
-  queryParams?: SearchParameters;
-  steps: JourneyStep[];
-  cookieParams?: { key: string; value: string };
+	amUrl?: string;
+	realmName?: string;
+	journeyName: string;
+	headers?: Headers;
+	queryParams?: SearchParameters;
+	steps: JourneyStep[];
+	cookieParams?: { key: string; value: string };
 }): Promise<void> {
-  const { BASE_URL, REALM } = loadConfig();
+	const { BASE_URL, REALM } = loadConfig();
 
-  if(!amUrl && !BASE_URL) {
-    throw new Error("No AM URL provided and no default URL found in the configuration");
-  }
+	if (!amUrl && !BASE_URL) {
+		throw new Error(
+			"No AM URL provided and no default URL found in the configuration",
+		);
+	}
 
-  if(!realmName && !REALM) {
-    throw new Error("No realm name provided and no default realm found in the configuration");
-  }
+	if (!realmName && !REALM) {
+		throw new Error(
+			"No realm name provided and no default realm found in the configuration",
+		);
+	}
 
-  const am = new AMInstance(amUrl ?? BASE_URL);
-  const realm = new AMRealm(realmName ?? REALM, am);
-  const journey = new Journey(
-    journeyName,
-    realm,
-    headers,
-    queryParams,
-    cookieParams
-  );
+	const am = new AMInstance(amUrl ?? BASE_URL);
+	const realm = new AMRealm(realmName ?? REALM, am);
+	const journey = new Journey(
+		journeyName,
+		realm,
+		headers,
+		queryParams,
+		cookieParams,
+	);
 
-  const preProcessedJourneySteps = preProcessJourneySteps(steps);
+	const preProcessedJourneySteps = preProcessJourneySteps(steps);
 
-  await processJourneySteps(journey, preProcessedJourneySteps);
+	await processJourneySteps(journey, preProcessedJourneySteps);
 }
 
 /**
@@ -86,9 +90,9 @@ export async function runJourney({
  * @returns An array of resolved `JourneyStep` objects.
  */
 function preProcessJourneySteps(
-  steps: (JourneyStep | (() => JourneyStep))[]
+	steps: (JourneyStep | (() => JourneyStep))[],
 ): JourneyStep[] {
-  return steps.flatMap((step) => (typeof step === "function" ? step() : step));
+	return steps.flatMap((step) => (typeof step === "function" ? step() : step));
 }
 
 /**
@@ -97,29 +101,29 @@ function preProcessJourneySteps(
  *
  * @param journey - The journey instance to process the steps for.
  * @param steps - An array of `JourneyStep` objects representing the steps to process.
- * 
+ *
  * @returns A promise that resolves when all steps have been processed.
  */
 export async function processJourneySteps(
-  journey: Journey,
-  steps: JourneyStep[]
+	journey: Journey,
+	steps: JourneyStep[],
 ) {
-  for await (const step of steps) {
-    if (step.preStep) {
-      await processStepOperations(journey, step.preStep, step.name, "preStep");
-    }
+	for await (const step of steps) {
+		if (step.preStep) {
+			await processStepOperations(journey, step.preStep, step.name, "preStep");
+		}
 
-    await journey.nextStep();
+		await journey.nextStep();
 
-    if (step.postStep) {
-      await processStepOperations(
-        journey,
-        step.postStep,
-        step.name,
-        "postStep"
-      );
-    }
-  }
+		if (step.postStep) {
+			await processStepOperations(
+				journey,
+				step.postStep,
+				step.name,
+				"postStep",
+			);
+		}
+	}
 }
 
 /**
@@ -133,48 +137,48 @@ export async function processJourneySteps(
  * @throws Will throw an error if any validation or action fails during processing.
  */
 export async function processStepOperations(
-  journey: Journey,
-  stepOperations: StepOperations,
-  stepName: string,
-  stage: string
+	journey: Journey,
+	stepOperations: StepOperations,
+	stepName: string,
+	stage: string,
 ) {
-  if (stepOperations.validation) {
-    if (stepOperations.validation.error) {
-      journey.validateError(stepOperations.validation.error, stepName, stage);
-    }
+	if (stepOperations.validation) {
+		if (stepOperations.validation.error) {
+			journey.validateError(stepOperations.validation.error, stepName, stage);
+		}
 
-    if (stepOperations.validation.response) {
-      journey.validateResponse(
-        stepOperations.validation.response,
-        stepName,
-        `${stage} validation response`
-      );
-    }
+		if (stepOperations.validation.response) {
+			journey.validateResponse(
+				stepOperations.validation.response,
+				stepName,
+				`${stage} validation response`,
+			);
+		}
 
-    if (stepOperations.validation.callbacks) {
-      journey.validateCallbacks(
-        stepOperations.validation.callbacks,
-        stepName,
-        `${stage} validation callbacks`
-      );
-    }
-  }
+		if (stepOperations.validation.callbacks) {
+			journey.validateCallbacks(
+				stepOperations.validation.callbacks,
+				stepName,
+				`${stage} validation callbacks`,
+			);
+		}
+	}
 
-  if (stepOperations.actions) {
-    for await (const input of stepOperations.actions) {
-      await actions[input.action](journey, input, stepName, `${stage} actions`);
-    }
-  }
+	if (stepOperations.actions) {
+		for await (const input of stepOperations.actions) {
+			await actions[input.action](journey, input, stepName, `${stage} actions`);
+		}
+	}
 }
 
 const actions = {
-  [Actions.createOTP]: createOTP,
-  [Actions.setNameCallbackValue]: setNameCallbackValue,
-  [Actions.setPasswordCallbackValue]: setPasswordCallbackValue,
-  [Actions.checkEmail]: checkEmail,
-  [Actions.setOTP]: setOTP,
-  [Actions.setCallbackValue]: setCallbackValue,
-  [Actions.saveOtpAuthURI]: saveOtpAuthURI,
+	[Actions.createOTP]: createOTP,
+	[Actions.setNameCallbackValue]: setNameCallbackValue,
+	[Actions.setPasswordCallbackValue]: setPasswordCallbackValue,
+	[Actions.checkEmail]: checkEmail,
+	[Actions.setOTP]: setOTP,
+	[Actions.setCallbackValue]: setCallbackValue,
+	[Actions.saveOtpAuthURI]: saveOtpAuthURI,
 };
 
 /**
@@ -185,9 +189,9 @@ const actions = {
  * @returns The generated OTP as a string.
  */
 export function generateOTP(otpAuthURI: string) {
-  const totp = OTPAuth.URI.parse(otpAuthURI);
+	const totp = OTPAuth.URI.parse(otpAuthURI);
 
-  return totp.generate();
+	return totp.generate();
 }
 
 /**
@@ -200,12 +204,12 @@ export function generateOTP(otpAuthURI: string) {
  * @returns A formatted string containing the step details.
  */
 export function stepMessageBuilder(
-  stepName?: string,
-  stage?: string,
-  action?: string,
-  message?: string
+	stepName?: string,
+	stage?: string,
+	action?: string,
+	message?: string,
 ) {
-  return `
+	return `
   Step: ${stepName ?? "N/A"}.
   Stage: ${stage ?? "N/A"}
   Action: ${action ?? "N/A"}

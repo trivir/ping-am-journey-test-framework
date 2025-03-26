@@ -3,8 +3,8 @@ import { AMRealm } from "./amRealm";
 import * as authenticateUtils from "./authenticate";
 
 export {
-  AMInstance,
-  CloudServiceAccountAuthStrategy,
-  AMRealm,
-  authenticateUtils,
+	AMInstance,
+	CloudServiceAccountAuthStrategy,
+	AMRealm,
+	authenticateUtils,
 };

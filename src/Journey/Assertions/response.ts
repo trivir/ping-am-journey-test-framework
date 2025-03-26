@@ -1,4 +1,4 @@
-import { hasProperties, defined } from "hamjest";
+import { defined, hasProperties } from "hamjest";
 
 /**
  * Will match if the authId property is defined on the object. If provided, it will only match if the exact authId value is defined.
@@ -6,7 +6,7 @@ import { hasProperties, defined } from "hamjest";
  * @returns
  */
 export function authId(authId?: string) {
-  return hasProperties({ authId: authId !== undefined ? authId : defined() });
+	return hasProperties({ authId: authId !== undefined ? authId : defined() });
 }
 
 /**
@@ -15,7 +15,7 @@ export function authId(authId?: string) {
  * @returns
  */
 export function header(header?: string) {
-  return hasProperties({ header: header !== undefined ? header : defined() });
+	return hasProperties({ header: header !== undefined ? header : defined() });
 }
 
 /**
@@ -24,9 +24,9 @@ export function header(header?: string) {
  * @returns
  */
 export function description(description?: string) {
-  return hasProperties({
-    description: description !== undefined ? description : defined(),
-  });
+	return hasProperties({
+		description: description !== undefined ? description : defined(),
+	});
 }
 
 /**
@@ -35,5 +35,5 @@ export function description(description?: string) {
  * @returns
  */
 export function successUrl(url?: string) {
-  return hasProperties({ successUrl: url !== undefined ? url : defined() });
+	return hasProperties({ successUrl: url !== undefined ? url : defined() });
 }

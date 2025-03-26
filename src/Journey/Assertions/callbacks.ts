@@ -1,12 +1,12 @@
 import {
-  hasProperties,
-  hasProperty,
-  hasItem,
-  startsWith,
-  hasItems,
-  object,
-  allOf,
-  Matcher,
+	type Matcher,
+	allOf,
+	hasItem,
+	hasItems,
+	hasProperties,
+	hasProperty,
+	object,
+	startsWith,
 } from "hamjest";
 import { Callbacks } from "../../Types";
 
@@ -17,17 +17,17 @@ import { Callbacks } from "../../Types";
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function nameCallback(prompt?: string): Matcher {
-  const isCorrectType = hasProperties({ type: Callbacks.NameCallback });
+	const isCorrectType = hasProperties({ type: Callbacks.NameCallback });
 
-  if (prompt === undefined) return isCorrectType;
+	if (prompt === undefined) return isCorrectType;
 
-  const matcher = hasProperties({
-    type: Callbacks.NameCallback,
-    output: hasItem(hasProperties({ name: "prompt", value: prompt })),
-    input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
-  });
+	const matcher = hasProperties({
+		type: Callbacks.NameCallback,
+		output: hasItem(hasProperties({ name: "prompt", value: prompt })),
+		input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
+	});
 
-  return matcher;
+	return matcher;
 }
 
 /**
@@ -37,17 +37,17 @@ function nameCallback(prompt?: string): Matcher {
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function passwordCallback(prompt?: string): Matcher {
-  const isCorrectType = hasProperties({ type: Callbacks.PasswordCallback });
+	const isCorrectType = hasProperties({ type: Callbacks.PasswordCallback });
 
-  if (prompt === undefined) return isCorrectType;
+	if (prompt === undefined) return isCorrectType;
 
-  const matcher = hasProperties({
-    type: Callbacks.PasswordCallback,
-    output: hasItem(hasProperties({ name: "prompt", value: prompt })),
-    input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
-  });
+	const matcher = hasProperties({
+		type: Callbacks.PasswordCallback,
+		output: hasItem(hasProperties({ name: "prompt", value: prompt })),
+		input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
+	});
 
-  return matcher;
+	return matcher;
 }
 
 /**
@@ -59,41 +59,41 @@ function passwordCallback(prompt?: string): Matcher {
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function textOutputCallback({
-  message,
-  messageType,
+	message,
+	messageType,
 }: { message?: string; messageType?: string } = {}): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.TextOutputCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.TextOutputCallback,
+	});
 
-  if (message === undefined && messageType === undefined) return isCorrectType;
+	if (message === undefined && messageType === undefined) return isCorrectType;
 
-  if (message && messageType) {
-    const matcher = hasProperties({
-      type: Callbacks.TextOutputCallback,
-      output: hasItems(
-        hasProperties({ name: "message", value: message }),
-        hasProperties({ name: "messageType", value: messageType })
-      ),
-    });
-    return matcher;
-  }
+	if (message && messageType) {
+		const matcher = hasProperties({
+			type: Callbacks.TextOutputCallback,
+			output: hasItems(
+				hasProperties({ name: "message", value: message }),
+				hasProperties({ name: "messageType", value: messageType }),
+			),
+		});
+		return matcher;
+	}
 
-  if (message && !messageType) {
-    const matcher = hasProperties({
-      type: Callbacks.TextOutputCallback,
-      output: hasItems(hasProperties({ name: "message", value: message })),
-    });
-    return matcher;
-  }
+	if (message && !messageType) {
+		const matcher = hasProperties({
+			type: Callbacks.TextOutputCallback,
+			output: hasItems(hasProperties({ name: "message", value: message })),
+		});
+		return matcher;
+	}
 
-  const matcher = hasProperties({
-    type: Callbacks.TextOutputCallback,
-    output: hasItems(
-      hasProperties({ name: "messageType", value: messageType })
-    ),
-  });
-  return matcher;
+	const matcher = hasProperties({
+		type: Callbacks.TextOutputCallback,
+		output: hasItems(
+			hasProperties({ name: "messageType", value: messageType }),
+		),
+	});
+	return matcher;
 }
 
 /**
@@ -102,7 +102,7 @@ function textOutputCallback({
  * @returns - A matcher function that always matches any object.
  */
 function ignoreCallback(): Matcher {
-  return object();
+	return object();
 }
 
 /**
@@ -116,62 +116,62 @@ function ignoreCallback(): Matcher {
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function confirmationCallback({
-  prompt,
-  messageType,
-  options,
-  optionType,
+	prompt,
+	messageType,
+	options,
+	optionType,
 }: {
-  prompt?: string;
-  messageType?: number;
-  options?: string[];
-  optionType?: number;
+	prompt?: string;
+	messageType?: number;
+	options?: string[];
+	optionType?: number;
 }): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.ConfirmationCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.ConfirmationCallback,
+	});
 
-  const hasCorrectOptions = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "options", value: options }))
-  );
+	const hasCorrectOptions = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "options", value: options })),
+	);
 
-  const hasCorrectOptionType = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "optionType", value: optionType }))
-  );
+	const hasCorrectOptionType = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "optionType", value: optionType })),
+	);
 
-  const hasCorrectMessageType = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "messageType", value: messageType }))
-  );
+	const hasCorrectMessageType = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "messageType", value: messageType })),
+	);
 
-  const hasCorrectPrompt = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "prompt", value: prompt }))
-  );
+	const hasCorrectPrompt = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "prompt", value: prompt })),
+	);
 
-  const hasInputToken = hasProperty(
-    "input",
-    hasItem(hasProperties({ name: startsWith("IDToken") }))
-  );
+	const hasInputToken = hasProperty(
+		"input",
+		hasItem(hasProperties({ name: startsWith("IDToken") })),
+	);
 
-  let matcherConditions = [isCorrectType];
+	let matcherConditions = [isCorrectType];
 
-  if (prompt !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectPrompt];
-  }
-  if (messageType !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectMessageType];
-  }
-  if (options !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectOptions];
-  }
-  if (optionType !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectOptionType];
-  }
+	if (prompt !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectPrompt];
+	}
+	if (messageType !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectMessageType];
+	}
+	if (options !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectOptions];
+	}
+	if (optionType !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectOptionType];
+	}
 
-  matcherConditions = [...matcherConditions, hasInputToken];
-  return allOf(...matcherConditions);
+	matcherConditions = [...matcherConditions, hasInputToken];
+	return allOf(...matcherConditions);
 }
 
 /**
@@ -181,19 +181,19 @@ function confirmationCallback({
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function validatedCreatePasswordCallback(prompt?: string): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.ValidatedCreatePasswordCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.ValidatedCreatePasswordCallback,
+	});
 
-  if (prompt === undefined) return isCorrectType;
+	if (prompt === undefined) return isCorrectType;
 
-  const matcher = hasProperties({
-    type: Callbacks.ValidatedCreatePasswordCallback,
-    output: hasItem(hasProperties({ name: "prompt", value: prompt })),
-    input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
-  });
+	const matcher = hasProperties({
+		type: Callbacks.ValidatedCreatePasswordCallback,
+		output: hasItem(hasProperties({ name: "prompt", value: prompt })),
+		input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
+	});
 
-  return matcher;
+	return matcher;
 }
 
 /**
@@ -203,19 +203,19 @@ function validatedCreatePasswordCallback(prompt?: string): Matcher {
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function validatedCreateUsernameCallback(prompt?: string): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.ValidatedCreateUsernameCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.ValidatedCreateUsernameCallback,
+	});
 
-  if (prompt === undefined) return isCorrectType;
+	if (prompt === undefined) return isCorrectType;
 
-  const matcher = hasProperties({
-    type: Callbacks.NameCallback,
-    output: hasItem(hasProperties({ name: "prompt", value: prompt })),
-    input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
-  });
+	const matcher = hasProperties({
+		type: Callbacks.NameCallback,
+		output: hasItem(hasProperties({ name: "prompt", value: prompt })),
+		input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
+	});
 
-  return matcher;
+	return matcher;
 }
 
 /**
@@ -228,54 +228,54 @@ function validatedCreateUsernameCallback(prompt?: string): Matcher {
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function choiceCallback({
-  prompt,
-  choices,
-  defaultChoice,
+	prompt,
+	choices,
+	defaultChoice,
 }: {
-  prompt?: string;
-  choices?: string[];
-  defaultChoice?: number;
+	prompt?: string;
+	choices?: string[];
+	defaultChoice?: number;
 }): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.ChoiceCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.ChoiceCallback,
+	});
 
-  const hasCorrectPrompt = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "prompt", value: prompt }))
-  );
+	const hasCorrectPrompt = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "prompt", value: prompt })),
+	);
 
-  const hasCorrectChoices = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "choices", value: choices }))
-  );
+	const hasCorrectChoices = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "choices", value: choices })),
+	);
 
-  const hasCorrectDefaultChoice = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "defaultChoice", value: defaultChoice }))
-  );
+	const hasCorrectDefaultChoice = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "defaultChoice", value: defaultChoice })),
+	);
 
-  const hasInputToken = hasProperty(
-    "input",
-    hasItem(hasProperties({ name: startsWith("IDToken") }))
-  );
+	const hasInputToken = hasProperty(
+		"input",
+		hasItem(hasProperties({ name: startsWith("IDToken") })),
+	);
 
-  let matcherConditions = [isCorrectType];
+	let matcherConditions = [isCorrectType];
 
-  if (prompt !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectPrompt];
-  }
+	if (prompt !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectPrompt];
+	}
 
-  if (choices !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectChoices];
-  }
+	if (choices !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectChoices];
+	}
 
-  if (defaultChoice !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectDefaultChoice];
-  }
+	if (defaultChoice !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectDefaultChoice];
+	}
 
-  matcherConditions = [...matcherConditions, hasInputToken];
-  return allOf(...matcherConditions);
+	matcherConditions = [...matcherConditions, hasInputToken];
+	return allOf(...matcherConditions);
 }
 
 /**
@@ -287,43 +287,43 @@ function choiceCallback({
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function hiddenValueCallback({
-  id,
-  initialValue,
+	id,
+	initialValue,
 }: {
-  id?: string;
-  initialValue?: string;
+	id?: string;
+	initialValue?: string;
 }): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.HiddenValueCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.HiddenValueCallback,
+	});
 
-  const hasCorrectId = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "id", value: id }))
-  );
+	const hasCorrectId = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "id", value: id })),
+	);
 
-  const hasCorrectinitialValue = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "value", value: initialValue }))
-  );
+	const hasCorrectinitialValue = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "value", value: initialValue })),
+	);
 
-  const hasInputToken = hasProperty(
-    "input",
-    hasItem(hasProperties({ name: startsWith("IDToken") }))
-  );
+	const hasInputToken = hasProperty(
+		"input",
+		hasItem(hasProperties({ name: startsWith("IDToken") })),
+	);
 
-  let matcherConditions = [isCorrectType];
+	let matcherConditions = [isCorrectType];
 
-  if (id !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectId];
-  }
+	if (id !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectId];
+	}
 
-  if (initialValue !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectinitialValue];
-  }
+	if (initialValue !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectinitialValue];
+	}
 
-  matcherConditions = [...matcherConditions, hasInputToken];
-  return allOf(...matcherConditions);
+	matcherConditions = [...matcherConditions, hasInputToken];
+	return allOf(...matcherConditions);
 }
 
 /**
@@ -333,19 +333,19 @@ function hiddenValueCallback({
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function stringAttributeInputCallback(prompt?: string): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.StringAttributeInputCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.StringAttributeInputCallback,
+	});
 
-  if (prompt === undefined) return isCorrectType;
+	if (prompt === undefined) return isCorrectType;
 
-  const matcher = hasProperties({
-    type: Callbacks.NameCallback,
-    output: hasItem(hasProperties({ name: "prompt", value: prompt })),
-    input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
-  });
+	const matcher = hasProperties({
+		type: Callbacks.NameCallback,
+		output: hasItem(hasProperties({ name: "prompt", value: prompt })),
+		input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
+	});
 
-  return matcher;
+	return matcher;
 }
 
 /**
@@ -355,22 +355,20 @@ function stringAttributeInputCallback(prompt?: string): Matcher {
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function booleanAttributeInputCallback(prompt?: string): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.BooleanAttributeInputCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.BooleanAttributeInputCallback,
+	});
 
-  if (prompt === undefined) return isCorrectType;
+	if (prompt === undefined) return isCorrectType;
 
-  const matcher = hasProperties({
-    type: Callbacks.NameCallback,
-    output: hasItem(hasProperties({ name: "prompt", value: prompt })),
-    input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
-  });
+	const matcher = hasProperties({
+		type: Callbacks.NameCallback,
+		output: hasItem(hasProperties({ name: "prompt", value: prompt })),
+		input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
+	});
 
-  return matcher;
+	return matcher;
 }
-
-
 
 /**
  * Validates whether a callback object matches the structure of a TermsAndConditionsCallback.
@@ -382,67 +380,67 @@ function booleanAttributeInputCallback(prompt?: string): Matcher {
  * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
 function termsAndConditionsCallback({
-  version,
-  terms,
-  createDate,
+	version,
+	terms,
+	createDate,
 }: {
-  version?: string;
-  terms?: string;
-  createDate?: string;
+	version?: string;
+	terms?: string;
+	createDate?: string;
 }): Matcher {
-  const isCorrectType = hasProperties({
-    type: Callbacks.TermsAndConditionsCallback,
-  });
+	const isCorrectType = hasProperties({
+		type: Callbacks.TermsAndConditionsCallback,
+	});
 
-  const hasCorrectVersion = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "version", value: version }))
-  );
+	const hasCorrectVersion = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "version", value: version })),
+	);
 
-  const hasCorrectTerms = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "terms", value: terms }))
-  );
+	const hasCorrectTerms = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "terms", value: terms })),
+	);
 
-  const hasCorrectCreateDate = hasProperty(
-    "output",
-    hasItem(hasProperties({ name: "createDate", value: createDate }))
-  );
+	const hasCorrectCreateDate = hasProperty(
+		"output",
+		hasItem(hasProperties({ name: "createDate", value: createDate })),
+	);
 
-  const hasInputToken = hasProperty(
-    "input",
-    hasItem(hasProperties({ name: startsWith("IDToken") }))
-  );
+	const hasInputToken = hasProperty(
+		"input",
+		hasItem(hasProperties({ name: startsWith("IDToken") })),
+	);
 
-  let matcherConditions = [isCorrectType];
+	let matcherConditions = [isCorrectType];
 
-  if (version !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectVersion];
-  }
+	if (version !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectVersion];
+	}
 
-  if (terms !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectTerms];
-  }
+	if (terms !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectTerms];
+	}
 
-  if (createDate !== undefined) {
-    matcherConditions = [...matcherConditions, hasCorrectCreateDate];
-  }
+	if (createDate !== undefined) {
+		matcherConditions = [...matcherConditions, hasCorrectCreateDate];
+	}
 
-  matcherConditions = [...matcherConditions, hasInputToken];
-  return allOf(...matcherConditions);
+	matcherConditions = [...matcherConditions, hasInputToken];
+	return allOf(...matcherConditions);
 }
 
 export {
-  nameCallback,
-  passwordCallback,
-  textOutputCallback,
-  ignoreCallback,
-  confirmationCallback,
-  validatedCreatePasswordCallback,
-  validatedCreateUsernameCallback,
-  choiceCallback,
-  hiddenValueCallback,
-  stringAttributeInputCallback,
-  booleanAttributeInputCallback,
-  termsAndConditionsCallback,
+	nameCallback,
+	passwordCallback,
+	textOutputCallback,
+	ignoreCallback,
+	confirmationCallback,
+	validatedCreatePasswordCallback,
+	validatedCreateUsernameCallback,
+	choiceCallback,
+	hiddenValueCallback,
+	stringAttributeInputCallback,
+	booleanAttributeInputCallback,
+	termsAndConditionsCallback,
 };

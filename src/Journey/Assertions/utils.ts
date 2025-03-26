@@ -1,6 +1,6 @@
-import { assertThat, is, Matcher, PropertiesMatcher } from "hamjest";
-import { AuthenticateResponse, Callback } from "../../Types";
-import { RequestError } from "got";
+import type { RequestError } from "got";
+import { type Matcher, type PropertiesMatcher, assertThat, is } from "hamjest";
+import type { AuthenticateResponse, Callback } from "../../Types";
 
 /**
  * A utility to validate objects
@@ -10,20 +10,20 @@ import { RequestError } from "got";
  * @returns
  */
 export function validateResponse(
-  response: AuthenticateResponse,
-  matchers: PropertiesMatcher | PropertiesMatcher[],
-  stepName?: string
+	response: AuthenticateResponse,
+	matchers: PropertiesMatcher | PropertiesMatcher[],
+	stepName?: string,
 ) {
-  if (Array.isArray(matchers)) {
-    return matchers.map((matcher) => {
-      return assertThat(`Step: ${stepName}`, response, matcher);
-    });
-  }
-  return assertThat(
-    stepName ? `Step: ${stepName}` : "",
-    response,
-    is(matchers)
-  );
+	if (Array.isArray(matchers)) {
+		return matchers.map((matcher) => {
+			return assertThat(`Step: ${stepName}`, response, matcher);
+		});
+	}
+	return assertThat(
+		stepName ? `Step: ${stepName}` : "",
+		response,
+		is(matchers),
+	);
 }
 
 /**
@@ -34,20 +34,20 @@ export function validateResponse(
  * @returns
  */
 export function validateError(
-  response: RequestError,
-  matchers: PropertiesMatcher | PropertiesMatcher[],
-  stepName?: string
+	response: RequestError,
+	matchers: PropertiesMatcher | PropertiesMatcher[],
+	stepName?: string,
 ) {
-  if (Array.isArray(matchers)) {
-    return matchers.map((matcher) => {
-      return assertThat(`Step: ${stepName}`, response, matcher);
-    });
-  }
-  return assertThat(
-    stepName ? `Step: ${stepName}` : "",
-    response,
-    is(matchers)
-  );
+	if (Array.isArray(matchers)) {
+		return matchers.map((matcher) => {
+			return assertThat(`Step: ${stepName}`, response, matcher);
+		});
+	}
+	return assertThat(
+		stepName ? `Step: ${stepName}` : "",
+		response,
+		is(matchers),
+	);
 }
 
 /**
@@ -58,15 +58,15 @@ export function validateError(
  * @returns
  */
 export function validateCallbacks(
-  callbacks: Callback[],
-  matchers: Matcher[],
-  stepName?: string
+	callbacks: Callback[],
+	matchers: Matcher[],
+	stepName?: string,
 ) {
-  return matchers.map((matcher, i) => {
-    return assertThat(
-      stepName ? `Callback for step: ${stepName}` : "",
-      callbacks?.[i],
-      is(matcher)
-    );
-  });
+	return matchers.map((matcher, i) => {
+		return assertThat(
+			stepName ? `Callback for step: ${stepName}` : "",
+			callbacks?.[i],
+			is(matcher),
+		);
+	});
 }

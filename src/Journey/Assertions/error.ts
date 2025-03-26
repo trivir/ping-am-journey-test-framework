@@ -6,7 +6,7 @@ import { defined, hasProperties } from "hamjest";
  * @returns
  */
 export function errorState({ message }: { message?: string } = {}) {
-  return hasProperties({
-    message: message !== undefined ? message : defined(),
-  });
+	return hasProperties({
+		message: message !== undefined ? message : defined(),
+	});
 }

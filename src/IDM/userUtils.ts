@@ -1,9 +1,9 @@
 import { AMInstance, CloudServiceAccountAuthStrategy } from "../AM/amInstance";
 import { AMRealm } from "../AM/amRealm";
-import { loadConfig } from "../config";
 import { Journey } from "../Journey/journey";
 import { processJourneySteps } from "../Journey/journeyUtils";
-import { JourneyStep, User } from "../Types";
+import type { JourneyStep, User } from "../Types";
+import { loadConfig } from "../config";
 import { CloudAmAuth, IDMInstance } from "./idmInstance";
 import { ManagedObject } from "./managedObject";
 
@@ -16,17 +16,17 @@ import { ManagedObject } from "./managedObject";
  * @returns the tokenId of the user session
  */
 export async function createUserSession({
-  journey,
-  steps,
+	journey,
+	steps,
 }: {
-  journey: Journey;
-  steps: JourneyStep[];
+	journey: Journey;
+	steps: JourneyStep[];
 }) {
-  await processJourneySteps(journey, steps);
+	await processJourneySteps(journey, steps);
 
-  await journey.nextStep();
+	await journey.nextStep();
 
-  return journey.lastResponse?.tokenId;
+	return journey.lastResponse?.tokenId;
 }
 
 /**
@@ -36,15 +36,15 @@ export async function createUserSession({
  * @param options.id the id of the user that should be deleted
  */
 export async function deleteUser({
-  users,
-  id,
+	users,
+	id,
 }: {
-  users: ManagedObject<User>;
-  id: string;
+	users: ManagedObject<User>;
+	id: string;
 }) {
-  try {
-    await users.delete(id);
-  } catch (error: any) {}
+	try {
+		await users.delete(id);
+	} catch (error: unknown) {}
 }
 
 /**
@@ -54,17 +54,16 @@ export async function deleteUser({
  * @param options.user user object that will be created
  */
 export async function createUser({
-  users,
-  user,
+	users,
+	user,
 }: {
-  users: ManagedObject<User>;
-  user: unknown;
+	users: ManagedObject<User>;
+	user: unknown;
 }) {
-  try {
-    await users.create(user);
-  } catch (error: any) {}
+	try {
+		await users.create(user);
+	} catch (error: unknown) {}
 }
-
 
 /**
  * create a managed users instance
@@ -74,57 +73,64 @@ export async function createUser({
  * @returns an object with the managed users instance and the realm
  */
 export async function createManagedUsersInstance({
-  amUrl,
-  realmName,
+	amUrl,
+	realmName,
 }: {
-  amUrl?: string;
-  realmName?: string;
+	amUrl?: string;
+	realmName?: string;
 }) {
-  const { BASE_URL, REALM } = loadConfig();
+	const { BASE_URL, REALM } = loadConfig();
 
-  if(!amUrl && !BASE_URL) {
-    throw new Error("No AM URL provided and no default URL found in the configuration");
-  }
+	if (!amUrl && !BASE_URL) {
+		throw new Error(
+			"No AM URL provided and no default URL found in the configuration",
+		);
+	}
 
-  if(!realmName && !REALM) {
-    throw new Error("No realm name provided and no default realm found in the configuration");
-  }
+	if (!realmName && !REALM) {
+		throw new Error(
+			"No realm name provided and no default realm found in the configuration",
+		);
+	}
 
-  const AM = new AMInstance(
-    amUrl ?? BASE_URL,
-    new CloudServiceAccountAuthStrategy()
-  );
+	const AM = new AMInstance(
+		amUrl ?? BASE_URL,
+		new CloudServiceAccountAuthStrategy(),
+	);
 
-  const IDM = new IDMInstance(amUrl ?? BASE_URL, new CloudAmAuth(AM));
+	const IDM = new IDMInstance(amUrl ?? BASE_URL, new CloudAmAuth(AM));
 
-  const realm = new AMRealm(realmName ?? REALM, AM);
+	const realm = new AMRealm(realmName ?? REALM, AM);
 
-  return {
-    usersManagedObject: new ManagedObject<User>(IDM, `${realmName ?? REALM}_user`),
-    realm: realm,
-  };
+	return {
+		usersManagedObject: new ManagedObject<User>(
+			IDM,
+			`${realmName ?? REALM}_user`,
+		),
+		realm: realm,
+	};
 }
 
 export async function generateUserSessionHeaders({
-  journeyName,
-  realm,
-  steps,
+	journeyName,
+	realm,
+	steps,
 }: {
-  journeyName: string;
-  realm: AMRealm;
-  steps: JourneyStep[];
+	journeyName: string;
+	realm: AMRealm;
+	steps: JourneyStep[];
 }) {
-  const journey = new Journey(journeyName, realm);
+	const journey = new Journey(journeyName, realm);
 
-  const userTokenId = await createUserSession({
-    journey,
-    steps,
-  });
+	const userTokenId = await createUserSession({
+		journey,
+		steps,
+	});
 
-  const { COOKIE_NAME } = loadConfig();
+	const { COOKIE_NAME } = loadConfig();
 
-  return {
-    ForceAuth: "true",
-    Cookie: `${COOKIE_NAME}=${userTokenId}`,
-  };
+	return {
+		ForceAuth: "true",
+		Cookie: `${COOKIE_NAME}=${userTokenId}`,
+	};
 }

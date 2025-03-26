@@ -1,69 +1,67 @@
 {
-  "name": "@trivir/ping-aic-lib-ts",
-  "publishConfig": {
-    "registry": "https://nexus.trivir.com/repository/trivir-npm/"
-  },
-  "private": true,
-  "version": "0.1.3",
-  "files": [
-    "dist"
-  ],
-  "type": "module",
-  "main": "./dist/ping-aic-lib-ts.js",
-  "module": "./dist/ping-aic-lib-ts.js",
-  "exports": {
-    ".": {
-      "import": "./dist/ping-aic-lib-ts.js"
-    },
-    "./AM": {
-      "import": "./dist/AM.js"
-    },
-    "./IDM": {
-      "import": "./dist/IDM.js"
-    },
-    "./Assertions": {
-      "import": "./dist/Assertions.js"
-    },
-    "./Journey": {
-      "import": "./dist/Journey.js"
-    },
-    "./Types": {
-      "import": "./dist/Types.js"
-    },
-    "./Utils": {
-      "import": "./dist/Utils.js"
-    }
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest",
-    "check": "biome check",
-    "format": "biome format --write",
-    "lint": "biome lint --write"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@types/imapflow": "^1.0.20",
-    "@types/mailparser": "^3.4.5",
-    "@types/node": "^22.10.2",
-    "@types/node-jose": "^1.1.13",
-    "typescript": "~5.6.2",
-    "vite": "^6.0.3",
-    "vite-plugin-dts": "^4.5.0",
-    "vitest": "^2.1.8"
-  },
-  "dependencies": {
-    "cosmiconfig": "^9.0.0",
-    "dotenv": "^16.4.7",
-    "got": "^14.4.5",
-    "hamjest": "^4.1.0",
-    "imapflow": "^1.0.174",
-    "mailparser": "^3.7.2",
-    "node-jose": "^2.2.0",
-    "otpauth": "^9.3.6",
-    "tough-cookie": "^5.1.0",
-    "uuid": "^11.0.3"
-  }
+	"name": "@trivir/ping-aic-lib-ts",
+	"publishConfig": {
+		"registry": "https://nexus.trivir.com/repository/trivir-npm/"
+	},
+	"private": true,
+	"version": "0.1.3",
+	"files": ["dist"],
+	"type": "module",
+	"main": "./dist/ping-aic-lib-ts.js",
+	"module": "./dist/ping-aic-lib-ts.js",
+	"exports": {
+		".": {
+			"import": "./dist/ping-aic-lib-ts.js"
+		},
+		"./AM": {
+			"import": "./dist/AM.js"
+		},
+		"./IDM": {
+			"import": "./dist/IDM.js"
+		},
+		"./Assertions": {
+			"import": "./dist/Assertions.js"
+		},
+		"./Journey": {
+			"import": "./dist/Journey.js"
+		},
+		"./Types": {
+			"import": "./dist/Types.js"
+		},
+		"./Utils": {
+			"import": "./dist/Utils.js"
+		}
+	},
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc && vite build",
+		"preview": "vite preview",
+		"test": "vitest",
+		"check": "biome check",
+		"format": "biome format --write",
+		"lint": "biome lint --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/imapflow": "^1.0.20",
+		"@types/mailparser": "^3.4.5",
+		"@types/node": "^22.10.2",
+		"@types/node-jose": "^1.1.13",
+		"typescript": "~5.6.2",
+		"vite": "^6.0.3",
+		"vite-plugin-dts": "^4.5.0",
+		"vitest": "^2.1.8"
+	},
+	"dependencies": {
+		"cosmiconfig": "^9.0.0",
+		"dotenv": "^16.4.7",
+		"got": "^14.4.5",
+		"hamjest": "^4.1.0",
+		"imapflow": "^1.0.174",
+		"mailparser": "^3.7.2",
+		"node-jose": "^2.2.0",
+		"otpauth": "^9.3.6",
+		"tough-cookie": "^5.1.0",
+		"uuid": "^11.0.3"
+	}
 }

@@ -28,78 +28,77 @@ import { simpleParser } from "mailparser";
  * console.log(`Extracted OTP: ${otp}`);
  */
 export async function checkEmail({
-  sender,
-  subject,
-  emailParser,
-  timeDelay,
+	sender,
+	subject,
+	emailParser,
+	timeDelay,
 }: {
-  sender?: string;
-  subject?: string;
-  emailParser?: (str: string) => string;
-  timeDelay?: number;
+	sender?: string;
+	subject?: string;
+	emailParser?: (str: string) => string;
+	timeDelay?: number;
 }) {
-  const { GMAIL, GMAIL_APP_PASSWORD } = loadConfig();
+	const { GMAIL, GMAIL_APP_PASSWORD } = loadConfig();
 
-  const client = new ImapFlow({
-    host: "smtp.gmail.com",
-    port: 993,
-    secure: true,
-    auth: {
-      user: GMAIL,
-      pass: GMAIL_APP_PASSWORD,
-    },
-    logger: false,
-  });
+	const client = new ImapFlow({
+		host: "smtp.gmail.com",
+		port: 993,
+		secure: true,
+		auth: {
+			user: GMAIL,
+			pass: GMAIL_APP_PASSWORD,
+		},
+		logger: false,
+	});
 
-  let otpValue = "";
-  await delay(timeDelay !== undefined ? timeDelay : 5000);
-  await client.connect();
-  let lock = await client.getMailboxLock("INBOX");
-  try {
-    let searchFilter = {};
-    if (sender) {
-      searchFilter = { ...searchFilter, from: sender };
-    }
-    if (subject) {
-      searchFilter = { ...searchFilter, subject: subject };
-    }
+	let otpValue = "";
+	await delay(timeDelay !== undefined ? timeDelay : 5000);
+	await client.connect();
+	const lock = await client.getMailboxLock("INBOX");
+	try {
+		let searchFilter = {};
+		if (sender) {
+			searchFilter = { ...searchFilter, from: sender };
+		}
+		if (subject) {
+			searchFilter = { ...searchFilter, subject: subject };
+		}
 
-    let list = await client.search(searchFilter);
+		const list = await client.search(searchFilter);
 
-    if (list.length < 1) {
-      throw new Error("No emails were found using the provided filter");
-    }
+		if (list.length < 1) {
+			throw new Error("No emails were found using the provided filter");
+		}
 
-    let message = await client.fetchOne(String(list[list.length - 1]), {
-      source: true,
-    });
+		const message = await client.fetchOne(String(list[list.length - 1]), {
+			source: true,
+		});
 
-    let parsed = await simpleParser(message.source);
+		const parsed = await simpleParser(message.source);
 
-    if (emailParser) {
-      otpValue = emailParser(parsed.text || "");
-    } else {
-      otpValue = extractOTPFromEmail(parsed.text || "");
-    }
-  } finally {
-    lock.release();
-  }
+		if (emailParser) {
+			otpValue = emailParser(parsed.text || "");
+		} else {
+			otpValue = extractOTPFromEmail(parsed.text || "");
+		}
+	} finally {
+		lock.release();
+	}
 
-  await client.logout();
+	await client.logout();
 
-  return otpValue;
+	return otpValue;
 }
 
 function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function extractOTPFromEmail(str: string) {
-  const parts = str.split(":");
+	const parts = str.split(":");
 
-  if (parts.length > 1) {
-    return parts[1].trim();
-  } else {
-    return parts[0].trim();
-  }
+	if (parts.length > 1) {
+		return parts[1].trim();
+	}
+	return parts[0].trim();
 }
