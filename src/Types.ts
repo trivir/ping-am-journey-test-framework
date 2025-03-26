@@ -1,6 +1,6 @@
 import { Matcher, PropertiesMatcher } from "hamjest";
 
-export enum CallbackType {
+export enum Callbacks {
   BooleanAttributeInputCallback = "BooleanAttributeInputCallback",
   ChoiceCallback = "ChoiceCallback",
   ConfirmationCallback = "ConfirmationCallback",
@@ -24,7 +24,7 @@ export enum CallbackType {
   ValidatedCreateUsernameCallback = "ValidatedCreateUsernameCallback",
 }
 
-export enum ActionType {
+export enum Actions {
   createOTP = "createOTP",
   setNameCallbackValue = "setNameCallbackValue",
   setPasswordCallbackValue = "setPasswordCallbackValue",
@@ -41,7 +41,7 @@ export type NameValuePair = {
 
 export type Callback = {
   _id?: number | null;
-  type: CallbackType;
+  type: Callbacks;
   input?: NameValuePair[];
   output?: NameValuePair[];
 };
@@ -78,8 +78,8 @@ export type JourneyStep = {
 };
 
 export type Action = {
-  action: ActionType;
-  callbackType?: CallbackType;
+  action: Actions;
+  callbackType?: Callbacks;
   checkEmailParams?: {
     sender?: string;
     subject?: string;

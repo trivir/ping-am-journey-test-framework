@@ -36,6 +36,7 @@ export default defineConfig(({ command, mode }) => {
           "otpauth",
           "uuid",
           "cosmiconfig",
+          "node:fs/promises",
         ],
         output: {
           globals: {

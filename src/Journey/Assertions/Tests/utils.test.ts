@@ -1,7 +1,7 @@
 import { test, describe } from "vitest";
 import { validateCallbacks, validateResponse } from "../utils";
 import { nameCallback, passwordCallback } from "../callbacks";
-import { CallbackType } from "../../../Types";
+import { Callbacks } from "../../../Types";
 import { authId, description, header } from "../response";
 
 describe("Assertion unit tests", () => {
@@ -36,7 +36,7 @@ describe("Assertion unit tests", () => {
         authId: "authIdString",
         callbacks: [
           {
-            type: CallbackType.NameCallback,
+            type: Callbacks.NameCallback,
             output: [
               {
                 name: "prompt",
@@ -52,7 +52,7 @@ describe("Assertion unit tests", () => {
             _id: 0,
           },
           {
-            type: CallbackType.PasswordCallback,
+            type: Callbacks.PasswordCallback,
             output: [
               {
                 name: "prompt",

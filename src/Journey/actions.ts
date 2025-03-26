@@ -1,4 +1,4 @@
-import { Action, CallbackType } from "../Types";
+import { Action, Callbacks } from "../Types";
 import { Journey } from "./journey";
 import { generateOTP, stepMessageBuilder } from "./journeyUtils";
 
@@ -8,7 +8,7 @@ export function saveOtpAuthURI(
   stepName: string,
   stage: string
 ) {
-  const otpAuthURI = journey.findOtpAuthURI();
+  const otpAuthURI = journey.saveOtpAuthURI();
 
   if (!otpAuthURI) {
     throw new Error(
@@ -64,7 +64,7 @@ export function setNameCallbackValue(
       )
     );
   }
-  journey.setValue(CallbackType.NameCallback, action.value, stepName, stage);
+  journey.setValue(Callbacks.NameCallback, action.value, stepName, stage);
 }
 
 export function setPasswordCallbackValue(
@@ -84,7 +84,7 @@ export function setPasswordCallbackValue(
     );
   }
   journey.setValue(
-    CallbackType.PasswordCallback,
+    Callbacks.PasswordCallback,
     action.value,
     stepName,
     stage

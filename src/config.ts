@@ -2,6 +2,7 @@ import { cosmiconfigSync } from "cosmiconfig";
 
 interface LibraryConfig {
   BASE_URL: string;
+  REALM: string;
   SERVICE_ACCOUNT_ID: string;
   SERVICE_ACCOUNT_CLIENT_ID: string;
   SERVICE_ACCOUNT_SCOPE: string;

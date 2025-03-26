@@ -12,7 +12,7 @@ import {
   validateError,
   validateResponse,
 } from "./Assertions/utils";
-import { AuthenticateResponse, Callback, CallbackType } from "../Types";
+import { AuthenticateResponse, Callback, Callbacks } from "../Types";
 import { checkEmail } from "../Utils/email";
 import { Logger } from "../Utils/logger";
 import { stepMessageBuilder } from "./journeyUtils";
@@ -29,6 +29,14 @@ export class Journey {
   private _queryParams: SearchParameters | null = null;
   private _cookieParams: { key: string; value: string } | null = null;
 
+  /**
+   * Creates a new instance of the Journey class.
+   * @param name - The name of the journey.
+   * @param realm - The authentication realm.
+   * @param headers - Optional HTTP headers for the journey.
+   * @param queryParams - Optional query parameters for the journey.
+   * @param cookieParams - Optional cookie parameters for the journey.
+   */
   public constructor(
     name: string,
     realm: AMRealm,
@@ -50,28 +58,61 @@ export class Journey {
     }
   }
 
+  /**
+   * Gets the last authentication response.
+   */
   public get lastResponse() {
     return this._lastResponse;
   }
 
+  /**
+   * Gets the the error response.
+   */
+    public get authError() {
+      return this._authError;
+    }
+
+  /**
+   * Gets the last current callbacks.
+   */
+
+  public get curCallbacks() {
+    return this._curCallbacks;
+  }
+
+  /**
+   * Gets the OTP value.
+   */
   public get otp(): string | null {
     return this._otp;
   }
 
+  /**
+   * Gets the OTP Auth URI.
+   */
   public get otpAuthURI(): string | null {
     return this._otpAuthURI;
   }
 
+  /**
+   * Sets the OTP value.
+   * @param otp - The OTP value to set.
+   */
   public set otp(otp: string) {
     this._otp = otp;
   }
 
+  /**
+   * Sets the OTP Auth URI.
+   * @param otpAuthURI - The OTP Auth URI to set.
+   */
   public set otpAuthURI(otpAuthURI: string) {
     this._otpAuthURI = otpAuthURI;
   }
 
   /**
-   * Move to the next step of the journey by calling the post authenticate endpoint.
+   * Proceeds to the next step in the authentication journey.
+   * @returns The authentication response.
    */
   public async nextStep() {
     const result = await this._postAuthenticate({
@@ -90,10 +131,16 @@ export class Journey {
     return result;
   }
 
+  /**
+   * Validates the callbacks in the last response.
+   * @param matchers - The matchers to validate against.
+   * @param stepName - The name of the step.
+   * @param stage - Optional stage name.
+   */
   public validateCallbacks(
     matchers: Matcher[],
     stepName: string,
-    stage: string
+    stage?: string
   ) {
     if (!this._lastResponse)
       throw new Error(
@@ -108,10 +155,16 @@ export class Journey {
     return validateCallbacks(this._lastResponse.callbacks, matchers, stepName);
   }
 
+  /**
+   * Validates the response properties in the last response.
+   * @param matchers - The matchers to validate against.
+   * @param stepName - The name of the step.
+   * @param stage - Optional stage name.
+   */
   public validateResponse(
     matchers: PropertiesMatcher | PropertiesMatcher[],
     stepName: string,
-    stage: string
+    stage?: string
   ) {
     if (!this._lastResponse)
       throw new Error(
@@ -126,10 +179,16 @@ export class Journey {
     return validateResponse(this._lastResponse, matchers, stepName);
   }
 
+  /**
+   * Validates the error in the last response.
+   * @param matchers - The matchers to validate against.
+   * @param stepName - The name of the step.
+   * @param stage - Optional stage name.
+   */
   public validateError(
     matchers: PropertiesMatcher | PropertiesMatcher[],
     stepName: string,
-    stage: string
+    stage?: string
   ) {
     if (!this._authError)
       throw new Error(
@@ -145,14 +204,17 @@ export class Journey {
   }
 
   /**
-   * Set the value for a provided callback type
-   * @param value a value to set as the callback value
+   * Sets the value for a specific callback type.
+   * @param callbackType - The type of the callback.
+   * @param value - The value to set.
+   * @param stepName - The name of the step.
+   * @param stage - Optional stage name.
    */
   public setValue(
-    callbackType: CallbackType,
+    callbackType: Callbacks,
     value: string,
     stepName: string,
-    stage: string
+    stage?: string
   ) {
     if (!this._curCallbacks)
       throw new Error(
@@ -174,14 +236,18 @@ export class Journey {
           stepName,
           stage,
           `set ${callbackType} to ${value}`,
-          "There was a problem seting the callback value"
+          "There was a problem setting the callback value"
         )
       );
 
     this._curCallbacks[callbackIndex].input[0].value = value;
   }
 
-  public findOtpAuthURI() {
+  /**
+   * Finds the OTP Auth URI in the last response.
+   * @returns The OTP Auth URI, if found.
+   */
+  public saveOtpAuthURI() {
     let otpAuthURI: null | string = null;
     this._lastResponse?.callbacks.map((item) => {
       item.output?.some((outputItem) => {
@@ -196,6 +262,10 @@ export class Journey {
     return otpAuthURI;
   }
 
+  /**
+   * Checks the email for an OTP value.
+   * @param options - The options for checking the email.
+   */
   public async checkEmail({
     sender,
     subject,
@@ -215,8 +285,14 @@ export class Journey {
     });
 
     this._otp = otpValue.trim();
+    return otpValue.trim();
   }
 
+  /**
+   * Sends a POST request to authenticate the journey.
+   * @param options - The options for the POST request.
+   * @returns The authentication response, if successful.
+   */
   private async _postAuthenticate({
     journeyName,
     body,

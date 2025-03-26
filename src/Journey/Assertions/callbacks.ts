@@ -6,29 +6,43 @@ import {
   hasItems,
   object,
   allOf,
+  Matcher,
 } from "hamjest";
-import { CallbackType } from "../../Types";
+import { Callbacks } from "../../Types";
 
 /**
  * Validates whether a callback object matches the structure of a NameCallback.
  *
- * This function checks if the given callback object has the correct type (`NameCallback`) and,
- * optionally, matches the provided `prompt` string. If a `prompt` is specified, the function
- * validates that the callback contains the specified prompt and an input field with a name
- * starting with "IDToken" and an empty value.
+ * @param prompt - An optional string to match against the `prompt` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
+function nameCallback(prompt?: string): Matcher {
+  const isCorrectType = hasProperties({ type: Callbacks.NameCallback });
+
+  if (prompt === undefined) return isCorrectType;
+
+  const matcher = hasProperties({
+    type: Callbacks.NameCallback,
+    output: hasItem(hasProperties({ name: "prompt", value: prompt })),
+    input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
+  });
+
+  return matcher;
+}
+
+/**
+ * Validates whether a callback object matches the structure of a PasswordCallback.
  *
  * @param prompt - An optional string to match against the `prompt` field in the callback.
- * @returns - A function that checks if a callback object matches the expected structure.
- *                       If `prompt` is undefined, it only checks for the correct type.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
  */
-
-function nameCallback(prompt?: string) {
-  const isCorrectType = hasProperties({ type: CallbackType.NameCallback });
+function passwordCallback(prompt?: string): Matcher {
+  const isCorrectType = hasProperties({ type: Callbacks.PasswordCallback });
 
   if (prompt === undefined) return isCorrectType;
 
   const matcher = hasProperties({
-    type: CallbackType.NameCallback,
+    type: Callbacks.PasswordCallback,
     output: hasItem(hasProperties({ name: "prompt", value: prompt })),
     input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
   });
@@ -36,33 +50,27 @@ function nameCallback(prompt?: string) {
   return matcher;
 }
 
-function passwordCallback(prompt?: string) {
-  const isCorrectType = hasProperties({ type: CallbackType.PasswordCallback });
-
-  if (prompt === undefined) return isCorrectType;
-
-  const matcher = hasProperties({
-    type: CallbackType.PasswordCallback,
-    output: hasItem(hasProperties({ name: "prompt", value: prompt })),
-    input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
-  });
-
-  return matcher;
-}
-
+/**
+ * Validates whether a callback object matches the structure of a TextOutputCallback.
+ *
+ * @param params - An object containing optional parameters.
+ * @param params.message - An optional string to match against the `message` field in the callback.
+ * @param params.messageType - An optional string to match against the `messageType` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
 function textOutputCallback({
   message,
   messageType,
-}: { message?: string; messageType?: string } = {}) {
+}: { message?: string; messageType?: string } = {}): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.TextOutputCallback,
+    type: Callbacks.TextOutputCallback,
   });
 
   if (message === undefined && messageType === undefined) return isCorrectType;
 
   if (message && messageType) {
     const matcher = hasProperties({
-      type: CallbackType.TextOutputCallback,
+      type: Callbacks.TextOutputCallback,
       output: hasItems(
         hasProperties({ name: "message", value: message }),
         hasProperties({ name: "messageType", value: messageType })
@@ -73,14 +81,14 @@ function textOutputCallback({
 
   if (message && !messageType) {
     const matcher = hasProperties({
-      type: CallbackType.TextOutputCallback,
+      type: Callbacks.TextOutputCallback,
       output: hasItems(hasProperties({ name: "message", value: message })),
     });
     return matcher;
   }
 
   const matcher = hasProperties({
-    type: CallbackType.TextOutputCallback,
+    type: Callbacks.TextOutputCallback,
     output: hasItems(
       hasProperties({ name: "messageType", value: messageType })
     ),
@@ -88,10 +96,25 @@ function textOutputCallback({
   return matcher;
 }
 
-function ignoreCallback() {
+/**
+ * Validates whether a callback object matches the structure of an IgnoreCallback.
+ *
+ * @returns - A matcher function that always matches any object.
+ */
+function ignoreCallback(): Matcher {
   return object();
 }
 
+/**
+ * Validates whether a callback object matches the structure of a ConfirmationCallback.
+ *
+ * @param params - An object containing optional parameters.
+ * @param params.prompt - An optional string to match against the `prompt` field in the callback.
+ * @param params.messageType - An optional number to match against the `messageType` field in the callback.
+ * @param params.options - An optional array of strings to match against the `options` field in the callback.
+ * @param params.optionType - An optional number to match against the `optionType` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
 function confirmationCallback({
   prompt,
   messageType,
@@ -102,9 +125,9 @@ function confirmationCallback({
   messageType?: number;
   options?: string[];
   optionType?: number;
-}) {
+}): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.ConfirmationCallback,
+    type: Callbacks.ConfirmationCallback,
   });
 
   const hasCorrectOptions = hasProperty(
@@ -151,15 +174,21 @@ function confirmationCallback({
   return allOf(...matcherConditions);
 }
 
-function validatedCreatePasswordCallback(prompt?: string) {
+/**
+ * Validates whether a callback object matches the structure of a ValidatedCreatePasswordCallback.
+ *
+ * @param prompt - An optional string to match against the `prompt` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
+function validatedCreatePasswordCallback(prompt?: string): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.ValidatedCreatePasswordCallback,
+    type: Callbacks.ValidatedCreatePasswordCallback,
   });
 
   if (prompt === undefined) return isCorrectType;
 
   const matcher = hasProperties({
-    type: CallbackType.ValidatedCreatePasswordCallback,
+    type: Callbacks.ValidatedCreatePasswordCallback,
     output: hasItem(hasProperties({ name: "prompt", value: prompt })),
     input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
   });
@@ -167,15 +196,21 @@ function validatedCreatePasswordCallback(prompt?: string) {
   return matcher;
 }
 
-function validatedCreateUsernameCallback(prompt?: string) {
+/**
+ * Validates whether a callback object matches the structure of a ValidatedCreateUsernameCallback.
+ *
+ * @param prompt - An optional string to match against the `prompt` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
+function validatedCreateUsernameCallback(prompt?: string): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.ValidatedCreateUsernameCallback,
+    type: Callbacks.ValidatedCreateUsernameCallback,
   });
 
   if (prompt === undefined) return isCorrectType;
 
   const matcher = hasProperties({
-    type: CallbackType.NameCallback,
+    type: Callbacks.NameCallback,
     output: hasItem(hasProperties({ name: "prompt", value: prompt })),
     input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
   });
@@ -183,6 +218,15 @@ function validatedCreateUsernameCallback(prompt?: string) {
   return matcher;
 }
 
+/**
+ * Validates whether a callback object matches the structure of a ChoiceCallback.
+ *
+ * @param params - An object containing optional parameters.
+ * @param params.prompt - An optional string to match against the `prompt` field in the callback.
+ * @param params.choices - An optional array of strings to match against the `choices` field in the callback.
+ * @param params.defaultChoice - An optional number to match against the `defaultChoice` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
 function choiceCallback({
   prompt,
   choices,
@@ -191,9 +235,9 @@ function choiceCallback({
   prompt?: string;
   choices?: string[];
   defaultChoice?: number;
-}) {
+}): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.ChoiceCallback,
+    type: Callbacks.ChoiceCallback,
   });
 
   const hasCorrectPrompt = hasProperty(
@@ -234,15 +278,23 @@ function choiceCallback({
   return allOf(...matcherConditions);
 }
 
+/**
+ * Validates whether a callback object matches the structure of a HiddenValueCallback.
+ *
+ * @param params - An object containing optional parameters.
+ * @param params.id - An optional string to match against the `id` field in the callback.
+ * @param params.initialValue - An optional string to match against the `value` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
 function hiddenValueCallback({
   id,
   initialValue,
 }: {
   id?: string;
   initialValue?: string;
-}) {
+}): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.HiddenValueCallback,
+    type: Callbacks.HiddenValueCallback,
   });
 
   const hasCorrectId = hasProperty(
@@ -274,15 +326,21 @@ function hiddenValueCallback({
   return allOf(...matcherConditions);
 }
 
-function stringAttributeInputCallback(prompt?: string) {
+/**
+ * Validates whether a callback object matches the structure of a StringAttributeInputCallback.
+ *
+ * @param prompt - An optional string to match against the `prompt` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
+function stringAttributeInputCallback(prompt?: string): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.StringAttributeInputCallback,
+    type: Callbacks.StringAttributeInputCallback,
   });
 
   if (prompt === undefined) return isCorrectType;
 
   const matcher = hasProperties({
-    type: CallbackType.NameCallback,
+    type: Callbacks.NameCallback,
     output: hasItem(hasProperties({ name: "prompt", value: prompt })),
     input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
   });
@@ -290,15 +348,21 @@ function stringAttributeInputCallback(prompt?: string) {
   return matcher;
 }
 
-function booleanAttributeInputCallback(prompt?: string) {
+/**
+ * Validates whether a callback object matches the structure of a BooleanAttributeInputCallback.
+ *
+ * @param prompt - An optional string to match against the `prompt` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
+function booleanAttributeInputCallback(prompt?: string): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.BooleanAttributeInputCallback,
+    type: Callbacks.BooleanAttributeInputCallback,
   });
 
   if (prompt === undefined) return isCorrectType;
 
   const matcher = hasProperties({
-    type: CallbackType.NameCallback,
+    type: Callbacks.NameCallback,
     output: hasItem(hasProperties({ name: "prompt", value: prompt })),
     input: hasItem(hasProperties({ name: startsWith("IDToken"), value: "" })),
   });
@@ -306,6 +370,17 @@ function booleanAttributeInputCallback(prompt?: string) {
   return matcher;
 }
 
+
+
+/**
+ * Validates whether a callback object matches the structure of a TermsAndConditionsCallback.
+ *
+ * @param params - An object containing optional parameters.
+ * @param params.version - An optional string to match against the `version` field in the callback.
+ * @param params.terms - An optional string to match against the `terms` field in the callback.
+ * @param params.createDate - An optional string to match against the `createDate` field in the callback.
+ * @returns - A matcher function that checks if a callback object matches the expected structure.
+ */
 function termsAndConditionsCallback({
   version,
   terms,
@@ -314,9 +389,9 @@ function termsAndConditionsCallback({
   version?: string;
   terms?: string;
   createDate?: string;
-}) {
+}): Matcher {
   const isCorrectType = hasProperties({
-    type: CallbackType.TermsAndConditionsCallback,
+    type: Callbacks.TermsAndConditionsCallback,
   });
 
   const hasCorrectVersion = hasProperty(

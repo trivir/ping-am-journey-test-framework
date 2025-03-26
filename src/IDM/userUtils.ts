@@ -48,20 +48,47 @@ export async function deleteUser({
 }
 
 /**
+ * create a user
+ * @param options options required to delete a specified user
+ * @param options.users a managedObject instance that may contain the specified user
+ * @param options.user user object that will be created
+ */
+export async function createUser({
+  users,
+  user,
+}: {
+  users: ManagedObject<User>;
+  user: unknown;
+}) {
+  try {
+    await users.create(user);
+  } catch (error: any) {}
+}
+
+
+/**
  * create a managed users instance
  * @param options options required to create a managed users inistance
- * @param options.amUrl the url for the am instance that the users belong to
- * @param options.realmName the name of the realm that the users belong to
- * @returns an object with
+ * @param options.amUrl the url for the am instance that the users belong to. Will use the value from the config if not provided.
+ * @param options.realmName the name of the realm that the users belong to. Will use the value from the config if not provided.
+ * @returns an object with the managed users instance and the realm
  */
 export async function createManagedUsersInstance({
   amUrl,
   realmName,
 }: {
   amUrl?: string;
-  realmName: string;
+  realmName?: string;
 }) {
-  const { BASE_URL } = loadConfig();
+  const { BASE_URL, REALM } = loadConfig();
+
+  if(!amUrl && !BASE_URL) {
+    throw new Error("No AM URL provided and no default URL found in the configuration");
+  }
+
+  if(!realmName && !REALM) {
+    throw new Error("No realm name provided and no default realm found in the configuration");
+  }
 
   const AM = new AMInstance(
     amUrl ?? BASE_URL,
@@ -70,10 +97,10 @@ export async function createManagedUsersInstance({
 
   const IDM = new IDMInstance(amUrl ?? BASE_URL, new CloudAmAuth(AM));
 
-  const realm = new AMRealm(realmName, AM);
+  const realm = new AMRealm(realmName ?? REALM, AM);
 
   return {
-    usersManagedObject: new ManagedObject<User>(IDM, `${realmName}_user`),
+    usersManagedObject: new ManagedObject<User>(IDM, `${realmName ?? REALM}_user`),
     realm: realm,
   };
 }

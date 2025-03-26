@@ -12,12 +12,12 @@ import {
   validatedCreatePasswordCallback,
   validatedCreateUsernameCallback,
 } from "../callbacks";
-import { CallbackType } from "../../../Types";
+import { Callbacks } from "../../../Types";
 
 describe("Callback unit tests", () => {
   describe("nameCallback unit tests", () => {
     const nameCallbackMock = {
-      type: CallbackType.NameCallback,
+      type: Callbacks.NameCallback,
       output: [
         {
           name: "prompt",
@@ -46,7 +46,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not NameCallback", () => {
       const invalidNameCallbackMock = {
         ...nameCallbackMock,
-        type: CallbackType.PasswordCallback,
+        type: Callbacks.PasswordCallback,
       };
 
       assertThat(invalidNameCallbackMock, not(nameCallback()));
@@ -54,7 +54,7 @@ describe("Callback unit tests", () => {
   });
   describe("passwordCallback unit tests", () => {
     const passwordCallbackMock = {
-      type: CallbackType.PasswordCallback,
+      type: Callbacks.PasswordCallback,
       output: [
         {
           name: "prompt",
@@ -84,7 +84,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not PasswordCallback", () => {
       const invalidPasswordCallbackMock = {
         ...passwordCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(invalidPasswordCallbackMock, not(passwordCallback()));
@@ -92,7 +92,7 @@ describe("Callback unit tests", () => {
   });
   describe("textOutputCallback unit tests", () => {
     const textOutputCallbackMock = {
-      type: CallbackType.TextOutputCallback,
+      type: Callbacks.TextOutputCallback,
       output: [
         {
           name: "message",
@@ -179,7 +179,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not TextOutputCallback", () => {
       const invalidTextOutputCallbackMock = {
         ...textOutputCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(
@@ -195,7 +195,7 @@ describe("Callback unit tests", () => {
   });
   describe("confirmationCallback unit tests", () => {
     const confirmationCallbackMock = {
-      type: CallbackType.ConfirmationCallback,
+      type: Callbacks.ConfirmationCallback,
       output: [
         {
           name: "prompt",
@@ -266,7 +266,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not ConfirmationCallback", () => {
       const invalidConfirmationCallbackMock = {
         ...confirmationCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(
@@ -349,7 +349,7 @@ describe("Callback unit tests", () => {
   });
   describe("validatedCreatePasswordCallback unit tests", () => {
     const validatedCreatePasswordCallbackMock = {
-      type: CallbackType.ValidatedCreatePasswordCallback,
+      type: Callbacks.ValidatedCreatePasswordCallback,
       output: [
         {
           name: "prompt",
@@ -391,7 +391,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not ValidatedCreatePasswordCallback", () => {
       const invalidValidatedCreatePasswordCallbackMock = {
         ...validatedCreatePasswordCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(
@@ -452,7 +452,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not ChoiceCallback", () => {
       const invalidChoiceCallbackMock = {
         ...choiceCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(invalidChoiceCallbackMock, not(choiceCallback({})));
@@ -535,7 +535,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not HiddenValueCallback", () => {
       const invalidHiddenValueCallbackMock = {
         ...hiddenValueCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(invalidHiddenValueCallbackMock, not(hiddenValueCallback({})));
@@ -653,7 +653,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not ValidatedCreateUsername", () => {
       const invalidValidatedCreatePasswordCallbackMock = {
         ...validatedCreateUsernameCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(
@@ -730,7 +730,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not StringAttributeInputCallback", () => {
       const invalidStringAttributeCallbackMock = {
         ...stringAttributeCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(
@@ -797,7 +797,7 @@ describe("Callback unit tests", () => {
     test("Should not match when the callback type is not termsAndConditionsCallback", () => {
       const invalidTermsAndConditionsCallbackMock = {
         ...termsAndConditionsCallbackMock,
-        type: CallbackType.NameCallback,
+        type: Callbacks.NameCallback,
       };
 
       assertThat(
