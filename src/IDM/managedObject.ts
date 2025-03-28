@@ -1,4 +1,5 @@
 import type { OptionsOfTextResponseBody } from "got";
+import { Logger } from "../Utils/logger";
 import type { IDMInstance } from "./idmInstance";
 
 export class ManagedObject<T> {
@@ -16,10 +17,19 @@ export class ManagedObject<T> {
 		authenticate = true,
 	) {
 		try {
+			const logger = Logger.getInstance();
 			const urlPath = `/openidm/managed/${this.objectType}${url}`;
 
+			logger.log("Managed object request:", urlPath, options);
+
 			return await this.idmInstance.request(urlPath, options, authenticate);
-		} catch (error) {}
+		} catch (error) {
+			console.log(
+				"Error in managedObject request:",
+				`/openidm/managed/${this.objectType}${url}`,
+				JSON.stringify(error, Object.getOwnPropertyNames(error)),
+			);
+		}
 	}
 
 	public async read(objectId: string): Promise<T> {

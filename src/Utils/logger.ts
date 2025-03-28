@@ -15,24 +15,11 @@ export class Logger {
 		return Logger._instance;
 	}
 
-	public log(message: string): void {
+	public log(message: string, ...args: unknown[]): void {
 		if (!this._logsEnabled) return;
-		const timestamp = new Date().toLocaleTimeString();
-		console.log(`[${timestamp}] ${message}`);
-	}
-
-	public info(message: string): void {
-		this.log(`INFO: ${message}`);
-	}
-
-	public warn(message: string): void {
-		this.log(`WARN: ${message}`);
-	}
-
-	public error(message: string, error?: Error): void {
-		this.log(`ERROR: ${message}`);
-		if (error) {
-			console.error(error);
+		console.log(message);
+		for (const arg of args) {
+			console.log(JSON.stringify(arg, null, 2));
 		}
 	}
 }

@@ -1,4 +1,5 @@
 import { type Action, Callbacks } from "../Types";
+import { Logger } from "../Utils/logger";
 import type { Journey } from "./journey";
 import { generateOTP, stepMessageBuilder } from "./journeyUtils";
 
@@ -8,6 +9,7 @@ export function saveOtpAuthURI(
 	stepName: string,
 	stage: string,
 ) {
+	const logger = Logger.getInstance();
 	const otpAuthURI = journey.saveOtpAuthURI();
 
 	if (!otpAuthURI) {
@@ -21,6 +23,8 @@ export function saveOtpAuthURI(
 		);
 	}
 
+	logger.log(`Found OTP Auth URI: ${otpAuthURI}`);
+
 	journey.otpAuthURI = otpAuthURI;
 }
 
@@ -30,6 +34,7 @@ export function createOTP(
 	stepName: string,
 	stage: string,
 ) {
+	const logger = Logger.getInstance();
 	const otpURI = action.value ?? journey.otpAuthURI;
 
 	if (!otpURI) {
@@ -43,7 +48,11 @@ export function createOTP(
 		);
 	}
 
+	logger.log(`Generating OTP using URI: ${otpURI}`);
+
 	const otp = generateOTP(otpURI);
+
+	logger.log(`Generated OTP: ${otp}`);
 
 	journey.otp = otp;
 }

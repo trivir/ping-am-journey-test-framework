@@ -142,7 +142,7 @@ export class Journey {
 		stepName: string,
 		stage?: string,
 	) {
-		if (!this._lastResponse)
+		if (!this._lastResponse) {
 			throw new Error(
 				stepMessageBuilder(
 					stepName,
@@ -151,6 +151,7 @@ export class Journey {
 					`Unexpected error response: ${this._authError?.message}`,
 				),
 			);
+		}
 
 		return validateCallbacks(this._lastResponse.callbacks, matchers, stepName);
 	}
@@ -166,7 +167,7 @@ export class Journey {
 		stepName: string,
 		stage?: string,
 	) {
-		if (!this._lastResponse)
+		if (!this._lastResponse) {
 			throw new Error(
 				stepMessageBuilder(
 					stepName,
@@ -175,6 +176,7 @@ export class Journey {
 					`Unexpected error response: ${this._authError?.message}`,
 				),
 			);
+		}
 
 		return validateResponse(this._lastResponse, matchers, stepName);
 	}
@@ -190,7 +192,7 @@ export class Journey {
 		stepName: string,
 		stage?: string,
 	) {
-		if (!this._authError)
+		if (!this._authError) {
 			throw new Error(
 				stepMessageBuilder(
 					stepName,
@@ -199,6 +201,7 @@ export class Journey {
 					"There is no error response to validate",
 				),
 			);
+		}
 
 		return validateError(this._authError, matchers, stepName);
 	}
@@ -216,7 +219,8 @@ export class Journey {
 		stepName: string,
 		stage?: string,
 	) {
-		if (!this._curCallbacks)
+		const logger = Logger.getInstance();
+		if (!this._curCallbacks) {
 			throw new Error(
 				stepMessageBuilder(
 					stepName,
@@ -225,12 +229,13 @@ export class Journey {
 					"Callbacks are undefined",
 				),
 			);
+		}
 
 		const callbackIndex = this._curCallbacks.findIndex((item) => {
 			return item.type === callbackType;
 		});
 
-		if (!this._curCallbacks?.[callbackIndex]?.input)
+		if (!this._curCallbacks?.[callbackIndex]?.input) {
 			throw new Error(
 				stepMessageBuilder(
 					stepName,
@@ -239,6 +244,9 @@ export class Journey {
 					"There was a problem setting the callback value",
 				),
 			);
+		}
+
+		logger.log(`Setting ${callbackType} value: ${value} for ${stepName}`);
 
 		this._curCallbacks[callbackIndex].input[0].value = value;
 	}
@@ -248,6 +256,7 @@ export class Journey {
 	 * @returns The OTP Auth URI, if found.
 	 */
 	public saveOtpAuthURI() {
+		const logger = Logger.getInstance();
 		let otpAuthURI: null | string = null;
 		this._lastResponse?.callbacks.map((item) => {
 			item.output?.some((outputItem) => {
@@ -259,6 +268,12 @@ export class Journey {
 				}
 			});
 		});
+
+		logger.log(
+			"Last Callback Response When Looking For OtpAuthURI:",
+			this._lastResponse,
+		);
+
 		return otpAuthURI;
 	}
 
@@ -349,6 +364,13 @@ export class Journey {
 			},
 		};
 
+		logger.log(
+			"Post /authenticate request:",
+			`URL: ${baseUrl.href}am/json/authenticate`,
+			"options:",
+			options,
+		);
+
 		try {
 			const data = await got(
 				`${baseUrl.href}am/json/authenticate`,
@@ -357,9 +379,15 @@ export class Journey {
 
 			this._authError = null;
 
-			logger.info(JSON.stringify(data));
+			logger.log("Post /authenticate response:", data);
 			return data as AuthenticateResponse;
 		} catch (error: unknown) {
+			logger.log(
+				"Error in postAuthenticate:",
+				(error as RequestError<unknown>).message,
+				"error",
+				JSON.stringify(error, Object.getOwnPropertyNames(error)),
+			);
 			this._authError = error as RequestError<unknown>;
 		}
 

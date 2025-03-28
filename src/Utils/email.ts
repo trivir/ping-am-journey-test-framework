@@ -2,6 +2,7 @@ import { loadConfig } from "../config";
 
 import { ImapFlow } from "imapflow";
 import { simpleParser } from "mailparser";
+import { Logger } from "./logger";
 
 /**
  * Checks an email inbox for a specific message and extracts an OTP (One-Time Password) using a parser.
@@ -39,6 +40,7 @@ export async function checkEmail({
 	timeDelay?: number;
 }) {
 	const { GMAIL, GMAIL_APP_PASSWORD } = loadConfig();
+	const logger = Logger.getInstance();
 
 	const client = new ImapFlow({
 		host: "smtp.gmail.com",
@@ -66,6 +68,11 @@ export async function checkEmail({
 
 		const list = await client.search(searchFilter);
 
+		logger.log(
+			`Found ${list.length} emails matching the filter:`,
+			searchFilter,
+		);
+
 		if (list.length < 1) {
 			throw new Error("No emails were found using the provided filter");
 		}
@@ -75,6 +82,8 @@ export async function checkEmail({
 		});
 
 		const parsed = await simpleParser(message.source);
+
+		logger.log("Parsed most recent email from filtered list:", parsed.text);
 
 		if (emailParser) {
 			otpValue = emailParser(parsed.text || "");
