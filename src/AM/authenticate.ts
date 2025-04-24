@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2025 TriVir LLC - All Rights Reserved
+ *
+ *  This software is proprietary and confidential.
+ *  Unauthorized copying of this file, via any medium, is strictly prohibited.
+ */
+
 import got, { type RequestError, type OptionsOfTextResponseBody } from "got";
 import jose from "node-jose";
 import { v4 as uuid } from "uuid";

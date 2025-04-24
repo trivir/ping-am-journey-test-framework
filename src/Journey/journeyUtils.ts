@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2025 TriVir LLC - All Rights Reserved
+ *
+ *  This software is proprietary and confidential.
+ *  Unauthorized copying of this file, via any medium, is strictly prohibited.
+ */
+
 import type { Headers, SearchParameters } from "got";
 import * as OTPAuth from "otpauth";
 import { AMInstance } from "../AM/amInstance";
